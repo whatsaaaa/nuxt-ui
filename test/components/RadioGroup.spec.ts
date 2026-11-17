@@ -167,6 +167,47 @@ describe('RadioGroup', () => {
     })
   })
 
+  // https://github.com/nuxt/ui/issues/7414
+  describe('accessible name and description', () => {
+    const items = [
+      { value: 'home', label: 'At home', description: 'Use your equipment.' },
+      { value: 'gym', label: 'Full gym' }
+    ]
+
+    function textOf(wrapper: any, ids?: string) {
+      return ids?.split(' ').map(id => wrapper.find(`[id="${id}"]`).text()).join(' ')
+    }
+
+    test.each(['list', 'card', 'table'] as const)('names the radio by its label and describes it by its description in the %s variant', async (variant) => {
+      const wrapper = await mountSuspended(RadioGroup, { props: { items, variant } })
+      const [home, gym] = wrapper.findAll('[role="radio"]')
+
+      expect(textOf(wrapper, home!.attributes('aria-labelledby'))).toBe('At home')
+      expect(textOf(wrapper, home!.attributes('aria-describedby'))).toBe('Use your equipment.')
+      expect(textOf(wrapper, gym!.attributes('aria-labelledby'))).toBe('Full gym')
+      expect(gym!.attributes('aria-describedby')).toBeUndefined()
+      expect(await axe(wrapper.element)).toHaveNoViolations()
+    })
+
+    test('links the description slot', async () => {
+      const wrapper = await mountSuspended(RadioGroup, {
+        props: { items: [{ value: 'home', label: 'At home' }], variant: 'card' },
+        slots: { description: () => 'Slot description' }
+      })
+      const radio = wrapper.find('[role="radio"]')
+
+      expect(textOf(wrapper, radio.attributes('aria-describedby'))).toBe('Slot description')
+    })
+
+    test('omits the ARIA links when an item has no label or description', async () => {
+      const wrapper = await mountSuspended(RadioGroup, { props: { items: [{ value: 'table', icon: 'i-lucide-table' }], indicator: 'hidden' } })
+      const radio = wrapper.find('[role="radio"]')
+
+      expect(radio.attributes('aria-labelledby')).toBeUndefined()
+      expect(radio.attributes('aria-describedby')).toBeUndefined()
+    })
+  })
+
   // https://github.com/nuxt/ui/issues/6033
   describe('label element', () => {
     test('is a <label> in the default (list) variant', async () => {
