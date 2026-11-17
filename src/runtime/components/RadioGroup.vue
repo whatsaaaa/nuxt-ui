@@ -236,7 +236,7 @@ function onUpdate(value: any) {
             :id="item.id"
             :value="item.value"
             :disabled="item.disabled || disabled"
-            :aria-labelledby="(item.label || !!slots.label) ? itemAriaId(index, 'label') : undefined"
+            :aria-labelledby="!isListVariant && (item.label || !!slots.label) ? itemAriaId(index, 'label') : undefined"
             :aria-describedby="(item.description || !!slots.description) ? itemAriaId(index, 'description') : undefined"
             data-slot="base"
             :class="ui.base({ class: [props.ui?.base, item.ui?.base], disabled: item.disabled || disabled })"
@@ -250,7 +250,7 @@ function onUpdate(value: any) {
           <component
             :is="isListVariant ? Label : 'div'"
             v-if="item.label || !!slots.label"
-            :id="itemAriaId(index, 'label')"
+            :id="isListVariant ? undefined : itemAriaId(index, 'label')"
             :for="isListVariant ? item.id : undefined"
             data-slot="label"
             :class="ui.label({ class: [props.ui?.label, item.ui?.label], disabled: item.disabled || disabled })"

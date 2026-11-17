@@ -177,7 +177,18 @@ describe('RadioGroup', () => {
       return ids?.split(' ').map(id => wrapper.find(`[id="${id}"]`).text()).join(' ')
     }
 
-    test.each(['list', 'card', 'table'] as const)('names the radio by its label and describes it by its description in the %s variant', async (variant) => {
+    test('names the radio by its <label for> and describes it by its description in the list variant', async () => {
+      const wrapper = await mountSuspended(RadioGroup, { props: { items } })
+      const [home, gym] = wrapper.findAll('[role="radio"]')
+
+      expect(home!.attributes('aria-labelledby')).toBeUndefined()
+      expect(wrapper.find(`label[for="${home!.attributes('id')}"]`).text()).toBe('At home')
+      expect(textOf(wrapper, home!.attributes('aria-describedby'))).toBe('Use your equipment.')
+      expect(gym!.attributes('aria-describedby')).toBeUndefined()
+      expect(await axe(wrapper.element)).toHaveNoViolations()
+    })
+
+    test.each(['card', 'table'] as const)('names the radio by its title only and describes it by its description in the %s variant', async (variant) => {
       const wrapper = await mountSuspended(RadioGroup, { props: { items, variant } })
       const [home, gym] = wrapper.findAll('[role="radio"]')
 
@@ -199,7 +210,7 @@ describe('RadioGroup', () => {
     })
 
     test('omits the ARIA links when an item has no label or description', async () => {
-      const wrapper = await mountSuspended(RadioGroup, { props: { items: [{ value: 'table', icon: 'i-lucide-table' }], indicator: 'hidden' } })
+      const wrapper = await mountSuspended(RadioGroup, { props: { items: [{ value: 'table', icon: 'i-lucide-table' }], indicator: 'hidden', variant: 'card' } })
       const radio = wrapper.find('[role="radio"]')
 
       expect(radio.attributes('aria-labelledby')).toBeUndefined()
