@@ -197,8 +197,6 @@ function labelIcon(item: any) {
   return props.indicator === 'hidden' ? item.icon : undefined
 }
 
-// Indexed rather than value-based like `item.id`, so a value containing whitespace can't split
-// the `aria-labelledby` / `aria-describedby` ID lists.
 function itemAriaId(index: number, part: 'label' | 'description') {
   return `${id}-item-${index}-${part}`
 }

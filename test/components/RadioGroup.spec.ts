@@ -167,7 +167,6 @@ describe('RadioGroup', () => {
     })
   })
 
-  // https://github.com/nuxt/ui/issues/7414
   describe('accessible name and description', () => {
     const items = [
       { value: 'home', label: 'At home', description: 'Use your equipment.' },
